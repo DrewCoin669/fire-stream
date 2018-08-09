@@ -165,9 +165,9 @@ contract LavaWallet is Owned {
   // mapping(address => uint256) depositedTokens;
 
    //receiptUUId => receipData
-    mapping(bytes32 => Receipt) public receipt;
 
-
+    //mapping(address => mapping (bytes32 => Receipt)) receipt;
+    mapping (bytes32 => uint) receipt;
 
     address public paymentToken;
 
@@ -178,7 +178,7 @@ contract LavaWallet is Owned {
       bytes32 invoiceUUID;
       uint256 amountRaw;
       address vendor;
-      bool exists;
+      bool success;
     }
 
 
@@ -225,18 +225,15 @@ contract LavaWallet is Owned {
     balances[token][to] = balances[token][to].add(tokens);
 
 
-  //  bytes32 receiptUUID = SHA3(to,tokens,invoiceUUID);
+    bytes32 receiptSignature = sha3(to,tokens,invoiceUUID);
 
-    require(receipt[invoiceUUID].exists == true);
+    //make sure the invoice was never paid
+    require(receipt[receiptSignature] == 0x0);
 
-    receipt[invoiceUUID] = Receipt({
-        invoiceUUID: invoiceUUID,
-        amountRaw: tokens,
-        vendor: to,
-        exists: true
-      });
+    //mark the invoice as paid
+    receipt[receiptSignature] = 0x1;
 
-      return true;
+    return true;
   }
 
   //No approve needed, only from msg.sender
@@ -255,10 +252,28 @@ contract LavaWallet is Owned {
        return balances[token][user];
    }
 
-   /*
-   function getReceipt(bytes32 invoiceUUID) public constant returns (Receipt) {
-        return receipt[invoiceUUID];
-    }*/
+
+   function getReceiptStatus(address vendor,uint256 amount, bytes32 invoiceUUID) public constant returns (uint) {
+
+        bytes32 receiptSignature = sha3(vendor,amount,invoiceUUID);
+
+        return receipt[receiptSignature];
+
+  }
+
+  //vendor can set status to arbitrary values representing any other status such as delivered, refunded, etc.
+  function setReceiptStatus(address vendor,uint256 amount, bytes32 invoiceUUID, uint newStatus) public  returns (bool) {
+
+       bytes32 receiptSignature = sha3(vendor,amount,invoiceUUID);
+
+       require(receipt[receiptSignature]!=0x0);
+       require(newStatus!=0x0);
+       require(msg.sender == vendor);
+
+       receipt[receiptSignature] = newStatus;
+
+       return true;
+ }
 
 
 
