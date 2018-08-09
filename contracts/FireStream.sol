@@ -173,14 +173,6 @@ contract LavaWallet is Owned {
 
 
 
-    struct Receipt
-    {
-      bytes32 invoiceUUID;
-      uint256 amountRaw;
-      address vendor;
-      bool success;
-    }
-
 
 
   //event Deposit(address token, address user, uint amount, uint balance);
