@@ -86,12 +86,6 @@ contract ERC918Interface {
 
 }
 
-contract MiningKingInterface {
-    function getKing() public returns (address);
-    function transferKing(address newKing) public;
-
-    event TransferKing(address from, address to);
-}
 
 contract ApproveAndCallFallBack {
 
@@ -101,57 +95,9 @@ contract ApproveAndCallFallBack {
 
 
 
-contract Owned {
-
-    address public owner;
-
-    address public newOwner;
 
 
-    event OwnershipTransferred(address indexed _from, address indexed _to);
-
-
-    function Owned() public {
-
-        owner = msg.sender;
-
-    }
-
-
-    modifier onlyOwner {
-
-        require(msg.sender == owner);
-
-        _;
-
-    }
-
-
-    function transferOwnership(address _newOwner) public onlyOwner {
-
-        newOwner = _newOwner;
-
-    }
-
-    function acceptOwnership() public {
-
-        require(msg.sender == newOwner);
-
-        OwnershipTransferred(owner, newOwner);
-
-        owner = newOwner;
-
-        newOwner = address(0);
-
-    }
-
-}
-
-
-
-
-
-contract LavaWallet is Owned {
+contract FireStream  {
 
 
   using SafeMath for uint;
